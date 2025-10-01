@@ -18,3 +18,4 @@ Remplacer le fichier de config nginx (/etc/nginx/nginx.conf) par notre config sp
 Ajouter nos sources dans /var/concentration/html/
 
 Lancer le serveur nginx
+

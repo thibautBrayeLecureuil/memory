@@ -7,9 +7,66 @@ jobs :
   test-memory-2026:
     runs-on: [self-hosted, linux]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Check des fichiers JPG
         run: |
           for file in $(find . -type f -name "*.jpg"); do
             echo "Check $file"
             file "$file"
+            type=$(file "$file")
+            if ! echo "$type" | grep -q "JPEG image data"; then
+              echo "$file est corrompu"
+              cp ./default.jpg "$file"
+            fi
           done
+
+  build-memory-2026:
+    runs-on: [self-hosted, linux]
+    needs: test-memory-2026
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026 .
+
+  push-memory-2026:
+    runs-on: [self-hosted, linux]
+    needs: build-memory-2026
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Push
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026
+          
+  deploy-memory-2026:
+    runs-on: ubuntu-latest
+    needs: push-memory-2026
+    steps:
+    - name: SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploiement
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost << 'EOF'
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026:latest
+
+          docker stop memory-2026
+          docker rm memory-2026
+
+          docker run -d --name memory-2026 -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026:latest
+        EOF
+
