@@ -7,9 +7,17 @@ jobs :
   test-memory-2026:
     runs-on: [self-hosted, linux]
     steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
       - name: Check des fichiers JPG
         run: |
           for file in $(find . -type f -name "*.jpg"); do
             echo "Check $file"
             file "$file"
+            type=$(file "$file")
+            if ! echo "$type" | grep -q "JPEG image data"; then
+              echo "$file est corrompu"
+              cp ./default.jpg "$file"
+            fi
           done
