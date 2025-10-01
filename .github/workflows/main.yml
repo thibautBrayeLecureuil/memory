@@ -1,0 +1,15 @@
+on:
+  push:
+    branches:
+      - develop
+
+jobs : 
+  test-memory-2026:
+    runs-on: ubuntu:latest
+    steps:
+      - name: Check des fichiers JPG
+        run: |
+          for file in $(find . -type f -name "*.jpg"); do
+            echo "Check $file"
+            file "$file"
+          done
