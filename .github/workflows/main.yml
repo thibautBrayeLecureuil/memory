@@ -31,7 +31,7 @@ jobs :
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ github.actor }}/memory-2026 .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026 .
 
   push-memory-2026:
     runs-on: [self-hosted, linux]
