@@ -7,7 +7,7 @@ jobs :
   test-memory-2026:
     runs-on: [self-hosted, linux]
     steps:
-      - name: Checkout du code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Check des fichiers JPG
@@ -21,3 +21,14 @@ jobs :
               cp ./default.jpg "$file"
             fi
           done
+
+  build-memory-2026:
+    runs-on: [self-hosted, linux]
+    needs: test-memory-2026
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ github.actor }}/memory-2026 .
