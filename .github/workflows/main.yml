@@ -48,4 +48,4 @@ jobs :
 
       - name: Push
         run: |
-          docker push ${{ github.actor }}/memory-2026
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026
