@@ -61,7 +61,7 @@ jobs :
 
     - name: Deploiement
       run: |
-        ssh ${{ secrets.SSH_USER }}@localhost << 'EOF'
+        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost << 'EOF'
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026:latest
 
           docker stop memory-2026
@@ -69,3 +69,4 @@ jobs :
 
           docker run -d --name memory-2026 -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/memory-2026:latest
         EOF
+
